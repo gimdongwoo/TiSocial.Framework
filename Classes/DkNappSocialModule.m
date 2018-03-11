@@ -764,6 +764,24 @@ MAKE_SYSTEM_PROP(ACTIVITY_CUSTOM, 100);
     }
     // End Image Provider
     
+    //added Dongwoo Gim 19/10/17 to allow for file support
+    id TiFileObject = [arguments objectForKey:@"file"];
+    if (TiFileObject != nil) {
+        if ([TiFileObject isKindOfClass:[TiBlob class]]) {
+            TiBlob *blob = (TiBlob *)TiFileObject;
+            if ([blob type] == TiBlobTypeFile) {
+                NSURL *fileUrl = [[NSURL fileURLWithPath:[blob path]] retain];
+                [activityItems addObject:fileUrl];
+            }
+        } else if ([TiFileObject isKindOfClass:[TiFile class]]) {
+            NSURL *fileUrl = [[NSURL fileURLWithPath:[(TiFile *)TiFileObject path]] retain];
+            [activityItems addObject:fileUrl];
+        } else if ([TiFileObject isKindOfClass:[NSString class]]) {
+            NSURL *fileUrl = [[TiUtils toURL:TiFileObject proxy:self] retain];
+            [activityItems addObject:fileUrl];
+        }
+    }
+    
     if(shareText){
         NappItemProvider *textItem = [[NappItemProvider alloc] initWithPlaceholderItem:@""];
         textItem.customText = shareText;
